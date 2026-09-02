@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-    
+
     <style>
         /* --- RESET & BASE STYLE --- */
         * {
@@ -25,9 +25,14 @@
             font-family: 'Poppins', sans-serif;
             background: linear-gradient(135deg, #fedac2, #fbc8d4, #e7bcf3);
             background-size: 400% 400%;
-            transition: background 3s ease;
+            animation: gradientShift 18s ease infinite;
         }
-        
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
         /* --- BACKGROUND EFFECTS --- */
         #canvas-bg {
             position: fixed;
@@ -52,6 +57,63 @@
         @keyframes floatBokeh {
             0% { transform: translate(0, 0) scale(1); }
             100% { transform: translate(100px, 50px) scale(1.2); }
+        }
+
+        /* floating cute emoji decorations */
+        .deco {
+            position: fixed;
+            z-index: 50;
+            pointer-events: auto;
+            cursor: pointer;
+            opacity: 0.85;
+            animation: bob 6s ease-in-out infinite;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.06));
+            transition: transform 0.25s ease, opacity 0.25s ease;
+        }
+        .deco:hover {
+            opacity: 1;
+            transform: scale(1.25) !important;
+        }
+        @keyframes bob {
+            0%, 100% { transform: translateY(0) rotate(-4deg); }
+            50% { transform: translateY(-18px) rotate(4deg); }
+        }
+
+        /* --- STICKER MESSAGE BOX --- */
+        .sticker-box {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.85);
+            width: min(380px, 85%);
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 30px 26px 24px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.18);
+            z-index: 500;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.35s ease, transform 0.35s ease;
+        }
+        .sticker-box.show {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+            pointer-events: auto;
+        }
+        .sticker-box p {
+            font-size: 1rem;
+            line-height: 1.65;
+            color: #4a4a4a;
+            font-weight: 500;
+            min-height: 3em;
+        }
+        .sticker-box .sticker-hint {
+            margin-top: 14px;
+            font-size: 0.72rem;
+            color: #b8b8b8;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
         }
 
         /* --- CONTROLS --- */
@@ -86,7 +148,8 @@
             align-items: center;
             z-index: 10;
             opacity: 0;
-            transform: scale(0.95) blur(10px);
+            transform: scale(0.95);
+            filter: blur(10px);
             pointer-events: none;
             transition: opacity 1.5s ease, transform 1.5s ease, filter 1.5s ease;
             padding: 20px;
@@ -94,12 +157,15 @@
         }
         .scene.active {
             opacity: 1;
-            transform: scale(1) blur(0px);
+            transform: scale(1);
+            filter: blur(0px);
             pointer-events: auto;
         }
 
         /* --- GLASSMORPHISM CARD --- */
         .card {
+            position: relative;
+            overflow: hidden;
             background: rgba(255, 255, 255, 0.15);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
@@ -137,7 +203,7 @@
             color: #ff477e;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.05);
         }
-        
+
         .btn-container {
             position: relative;
             display: flex;
@@ -180,7 +246,8 @@
             background: #ffffff;
             color: #6c757d;
             position: absolute;
-            transition: transform 0.1s ease-out;
+            z-index: 200;
+            transition: transform 0.15s ease-out, top 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), left 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
             will-change: transform, top, left;
         }
 
@@ -231,26 +298,28 @@
             position: fixed;
             pointer-events: none;
             color: #ff6584;
-            font-size: 12px;
+            font-size: 14px;
             z-index: 9999;
-            animation: fadeUp 0.8s forwards linear;
+            animation: fadeUp 0.9s forwards linear;
         }
         @keyframes fadeUp {
             0% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-            100% { opacity: 0; transform: translate(-50%, -120%) scale(0.5); }
+            100% { opacity: 0; transform: translate(-50%, -140%) scale(0.4); }
         }
 
-        /* --- CAMERA SHAKE --- */
-        .shake {
-            animation: cameraShake 0.5s infinite;
+        /* burst hearts when saying YES */
+        .burst-heart {
+            position: fixed;
+            pointer-events: none;
+            z-index: 9998;
+            font-size: 20px;
+            animation: burstUp 1.4s ease-out forwards;
         }
-        @keyframes cameraShake {
-            0%, 100% { transform: translate(0, 0); }
-            20% { transform: translate(-2px, 2px); }
-            40% { transform: translate(2px, -1px); }
-            60% { transform: translate(-1px, -2px); }
-            80% { transform: translate(2px, 2px); }
+        @keyframes burstUp {
+            0% { opacity: 1; transform: translate(-50%, -50%) scale(0.6) rotate(0deg); }
+            100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(1.1) rotate(var(--rot)); }
         }
+
         .ripple {
             position: absolute;
             background: rgba(255, 255, 255, 0.5);
@@ -262,6 +331,17 @@
         @keyframes rippleEffect {
             to { transform: scale(4); opacity: 0; }
         }
+
+        /* typing cursor for success handwriting line */
+        .type-cursor::after {
+            content: '|';
+            animation: blink 0.8s step-end infinite;
+        }
+        @keyframes blink { 50% { opacity: 0; } }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; }
+        }
     </style>
 </head>
 <body>
@@ -270,13 +350,45 @@
     <div class="bokeh" style="top: 10%; left: 10%;"></div>
     <div class="bokeh" style="bottom: 15%; right: 10%; animation-delay: -5s;"></div>
 
+    <!-- cute floating decorations (click each to reveal a message) -->
+    <div class="deco"
+         data-msg-en="For sure! I love breathtaking views and usually spend most of my free time soaking them in. You're a gorgeous flower who deserves only the best, and I want to cherish you just as deeply."
+         data-msg-vi="Chắc chắn rồi! Anh rất thích những khung cảnh tuyệt đẹp và thường dành phần lớn thời gian rảnh để đắm mình trong đó. Em là một đoá hoa xinh đẹp xứng đáng với những điều tốt nhất, và anh muốn nâng niu em sâu sắc như vậy."
+         style="top:12%; left:8%; font-size:28px; animation-delay:0s;">🌸</div>
+    <div class="deco"
+         data-msg-en="They say Taurus is grounded and practical, but falling for you makes me want to reach for the star—and that star is right in front of me: IT'S YOU."
+         data-msg-vi="Người ta bảo Kim Ngưu thực tế và chắc chắn, nhưng khi yêu em, anh lại muốn vươn đến vì sao — và ngôi sao đó đang ở ngay trước mặt anh: CHÍNH LÀ EM."
+         style="top:75%; left:12%; font-size:22px; animation-delay:1.2s;">⭐</div>
+    <div class="deco"
+         data-msg-en="Maybe this is an ideal plan for us to have a meal together"
+         data-msg-vi="Có lẽ đây sẽ là một kế hoạch lý tưởng để chúng mình cùng nhau ăn một bữa"
+         style="top:20%; right:10%; font-size:26px; animation-delay:2s;">🍡</div>
+    <div class="deco"
+         data-msg-en="I pour all my love, longing, and cherished feelings into this envelope, hoping that as you read it, you can feel my warmth right by your side."
+         data-msg-vi="Anh gói trọn tình yêu, nỗi nhớ và những cảm xúc trân quý vào chiếc phong thư này, mong rằng khi em đọc, em sẽ cảm nhận được hơi ấm của anh luôn ở bên cạnh."
+         style="bottom:12%; right:15%; font-size:24px; animation-delay:0.6s;">💌</div>
+
+    <!-- message box revealed when a sticker is tapped -->
+    <div class="sticker-box" id="stickerBox">
+        <p id="stickerText"></p>
+        <div class="sticker-hint">chạm vào khung để đổi ngôn ngữ · chạm nơi khác để đóng</div>
+    </div>
+
     <!-- Audio Mute/Unmute -->
     <div class="audio-control" id="audioToggle">
         <svg id="icon-mute" viewBox="0 0 24 24" style="display:none;"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM4.34 2.93L2.93 4.34 7.29 8.7H3v6.6h4.4l5.6 5.6v-8.15l4.73 4.73c-.68.43-1.43.75-2.23.93v2.02c1.34-.27 2.57-.92 3.59-1.83l2.22 2.22 1.41-1.41L4.34 2.93zM13 5.4 L10.86 7.54 13 9.68V5.4zm4.5 6.6c0 .88-.18 1.71-.49 2.48l1.46 1.46c.65-1.19 1.03-2.54 1.03-3.94 0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71z"/></svg>
         <svg id="icon-audio" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
     </div>
-    
-    <audio id="bgMusic" loop src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" preload="auto"></audio>
+
+    <!--
+      NHẠC NỀN "In Love" (Low G x JustaTee) — bản có bản quyền nên không thể tự
+      đóng gói file mp3 vào trang. Cách hợp lệ: nhúng player YouTube chính chủ
+      (video: https://www.youtube.com/watch?v=x8cz2E_nutc) và ẩn nó đi, điều
+      khiển play/mute qua YouTube IFrame API bên dưới.
+      Nếu bạn có file nhạc bạn sở hữu bản quyền/giấy phép sử dụng, có thể thay
+      khối này bằng thẻ <audio> như bản gốc và trỏ src tới file đó.
+    -->
+    <div id="yt-player" style="position:fixed; width:1px; height:1px; opacity:0; pointer-events:none;"></div>
 
     <!-- SCENE 1: THE DAY OF US -->
     <div class="scene" id="scene1">
@@ -285,7 +397,7 @@
 
     <!-- SCENE 2: THE QUESTION -->
     <div class="scene" id="scene2">
-        <div class="card">
+        <div class="card" id="card2">
             <h2 class="question-txt">CAN YOU SPEND A LITTLE TIME GOING ON A DATE WITH ME?</h2>
             <div class="btn-container" id="btnContainer">
                 <button class="btn btn-yes" id="btnYes">❤️ YES</button>
@@ -313,11 +425,362 @@
     <!-- SCENE 4 & 5: WAITING & SUCCESS -->
     <div class="scene" id="scene4">
         <h1 class="cinematic-txt" id="successTxt1" style="font-size:2.5rem; transition: opacity 1s;">LOOKING FORWARD TO THIS MEETING ❤️</h1>
-        <h1 class="handwriting" id="successTxt2" style="display:none; opacity:0; transition: opacity 1s;">Have a good day, bae !!!</h1>
+        <h1 class="handwriting" id="successTxt2" style="display:none; opacity:0; transition: opacity 1s;"></h1>
     </div>
 
     <footer>made by VOMINHTRIET</footer>
 
-    <script src="script.js"></script>
+    <script src="https://www.youtube.com/iframe_api"></script>
+    <script>
+    /* ============================================================
+       NHẠC NỀN qua YouTube IFrame API — thay VIDEO_ID nếu muốn đổi bài
+       ============================================================ */
+    const YT_VIDEO_ID = 'x8cz2E_nutc'; // Low G - In Love (ft. JustaTee) - official
+    let ytPlayer, ytReady = false, isMuted = true;
+
+    function onYouTubeIframeAPIReady() {
+        ytPlayer = new YT.Player('yt-player', {
+            height: '1', width: '1', videoId: YT_VIDEO_ID,
+            playerVars: { autoplay: 1, loop: 1, playlist: YT_VIDEO_ID, controls: 0 },
+            events: {
+                onReady: (e) => {
+                    ytReady = true;
+                    e.target.mute();
+                    e.target.playVideo();
+                }
+            }
+        });
+    }
+
+    const audioToggle = document.getElementById('audioToggle');
+    const iconMute = document.getElementById('icon-mute');
+    const iconAudio = document.getElementById('icon-audio');
+    audioToggle.addEventListener('click', () => {
+        if (!ytReady) return;
+        isMuted = !isMuted;
+        if (isMuted) { ytPlayer.mute(); iconMute.style.display = 'block'; iconAudio.style.display = 'none'; }
+        else { ytPlayer.unMute(); iconMute.style.display = 'none'; iconAudio.style.display = 'block'; }
+    });
+
+    /* ============================================================
+       SCENE FLOW
+       ============================================================ */
+    const scenes = ['scene1', 'scene2', 'scene3', 'scene4'];
+    function showScene(id) {
+        scenes.forEach(s => document.getElementById(s).classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        // Nút No có thể đã được "gỡ" ra khỏi khung nhỏ để né tự do khắp
+        // màn hình (xem detachNo() bên dưới) — nên cần tự ẩn/hiện nó theo
+        // scene hiện tại, tránh việc nó bị kẹt lại đè lên scene khác.
+        const noBtn = document.getElementById('btnNo');
+        if (noBtn) {
+            const visible = (id === 'scene2');
+            noBtn.style.opacity = visible ? '1' : '0';
+            noBtn.style.pointerEvents = visible ? 'auto' : 'none';
+        }
+    }
+    showScene('scene1');
+    setTimeout(() => showScene('scene2'), 2200);
+
+    /* ============================================================
+       CANVAS: TIM BAY LƠ LỬNG NỀN
+       ============================================================ */
+    const canvas = document.getElementById('canvas-bg');
+    const ctx = canvas.getContext('2d');
+    function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    const floatHearts = [];
+    function spawnFloatHeart() {
+        floatHearts.push({
+            x: Math.random() * canvas.width,
+            y: canvas.height + 20,
+            size: 10 + Math.random() * 18,
+            speed: 0.4 + Math.random() * 0.8,
+            drift: (Math.random() - 0.5) * 0.6,
+            opacity: 0.15 + Math.random() * 0.25,
+            wobble: Math.random() * Math.PI * 2
+        });
+    }
+    for (let i = 0; i < 14; i++) { spawnFloatHeart(); floatHearts[i].y = Math.random() * canvas.height; }
+
+    function drawHeart(x, y, size, opacity) {
+        ctx.save();
+        ctx.globalAlpha = opacity;
+        ctx.font = `${size}px sans-serif`;
+        ctx.fillText('💗', x, y);
+        ctx.restore();
+    }
+
+    function animateBg() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        floatHearts.forEach(h => {
+            h.y -= h.speed;
+            h.wobble += 0.02;
+            h.x += Math.sin(h.wobble) * h.drift;
+            drawHeart(h.x, h.y, h.size, h.opacity);
+            if (h.y < -30) {
+                h.y = canvas.height + 20;
+                h.x = Math.random() * canvas.width;
+            }
+        });
+        requestAnimationFrame(animateBg);
+    }
+    animateBg();
+
+    /* ============================================================
+       VỆT TIM THEO CHUỘT / NGÓN TAY
+       ============================================================ */
+    let lastTrail = 0;
+    function spawnTrail(x, y) {
+        if (document.getElementById('stickerBox').classList.contains('show')) return;
+        const now = Date.now();
+        if (now - lastTrail < 60) return;
+        lastTrail = now;
+        const el = document.createElement('div');
+        el.className = 'heart-trail';
+        el.textContent = ['💖', '✨', '💕'][Math.floor(Math.random() * 3)];
+        el.style.left = x + 'px';
+        el.style.top = y + 'px';
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), 900);
+    }
+    window.addEventListener('mousemove', (e) => spawnTrail(e.clientX, e.clientY));
+    window.addEventListener('touchmove', (e) => {
+        const t = e.touches[0];
+        if (t) spawnTrail(t.clientX, t.clientY);
+    }, { passive: true });
+
+    /* ============================================================
+       RIPPLE KHI CHẠM VÀO CARD
+       ============================================================ */
+    document.querySelectorAll('.card').forEach(card => {
+        card.addEventListener('click', (e) => {
+            const rect = card.getBoundingClientRect();
+            const ripple = document.createElement('div');
+            const size = 20;
+            ripple.className = 'ripple';
+            ripple.style.width = ripple.style.height = size + 'px';
+            ripple.style.left = (e.clientX - rect.left - size / 2) + 'px';
+            ripple.style.top = (e.clientY - rect.top - size / 2) + 'px';
+            card.appendChild(ripple);
+            setTimeout(() => ripple.remove(), 600);
+        });
+    });
+
+    /* ============================================================
+       NÚT NO NÉ CHUỘT, NÚT YES MỜI GỌI DẦN DẦN
+       ============================================================ */
+    const btnYes = document.getElementById('btnYes');
+    const btnNo = document.getElementById('btnNo');
+    const btnContainer = document.getElementById('btnContainer');
+    let noDodgeCount = 0;
+    let noDetached = false;
+    let lastNoX = null, lastNoY = null;
+
+    // Lần né đầu tiên: "thoát" nút No ra khỏi khung nhỏ trong thẻ để nó
+    // có thể di chuyển tự do khắp màn hình thay vì chỉ trong btnContainer.
+    function detachNo() {
+        if (noDetached) return;
+        const rect = btnNo.getBoundingClientRect();
+        document.body.appendChild(btnNo);
+        btnNo.style.position = 'fixed';
+        btnNo.style.margin = '0';
+        btnNo.style.left = rect.left + 'px';
+        btnNo.style.top = rect.top + 'px';
+        // ép reflow rồi mới cho phép transition top/left chạy mượt ở lần né kế tiếp
+        void btnNo.offsetWidth;
+        noDetached = true;
+    }
+
+    function dodgeNo() {
+        detachNo();
+        const margin = 16;
+        const w = btnNo.offsetWidth || 90;
+        const h = btnNo.offsetHeight || 44;
+        const maxX = Math.max(margin, window.innerWidth - w - margin);
+        const maxY = Math.max(margin, window.innerHeight - h - margin);
+
+        let newX, newY, attempts = 0;
+        do {
+            newX = margin + Math.random() * (maxX - margin);
+            newY = margin + Math.random() * (maxY - margin);
+            attempts++;
+        } while (
+            lastNoX !== null && attempts < 6 &&
+            Math.hypot(newX - lastNoX, newY - lastNoY) < Math.min(window.innerWidth, window.innerHeight) * 0.25
+        );
+
+        btnNo.style.left = newX + 'px';
+        btnNo.style.top = newY + 'px';
+        lastNoX = newX;
+        lastNoY = newY;
+
+        noDodgeCount++;
+        if (noDodgeCount >= 3) btnYes.classList.add('pulse-invite');
+    }
+
+    btnNo.addEventListener('mouseenter', dodgeNo);
+    btnNo.addEventListener('touchstart', (e) => { e.preventDefault(); dodgeNo(); }, { passive: false });
+    btnNo.addEventListener('click', (e) => { e.preventDefault(); dodgeNo(); });
+
+    // Né sớm khi chuột chỉ mới đến GẦN nút (không cần chạm hẳn vào) để cảm
+    // giác "linh hoạt" hơn trên desktop.
+    let lastMouseDodge = 0;
+    document.addEventListener('mousemove', (e) => {
+        const scene2 = document.getElementById('scene2');
+        if (!scene2 || !scene2.classList.contains('active')) return;
+        const now = Date.now();
+        if (now - lastMouseDodge < 220) return; // chống né liên tục quá dày
+        const rect = btnNo.getBoundingClientRect();
+        const cx = rect.left + rect.width / 2;
+        const cy = rect.top + rect.height / 2;
+        const dist = Math.hypot(e.clientX - cx, e.clientY - cy);
+        if (dist < 90) {
+            lastMouseDodge = now;
+            dodgeNo();
+        }
+    });
+
+    // Trên điện thoại: khi ngón tay rê tới gần nút cũng cho nút né,
+    // vì trên mobile không có "hover" trước khi chạm.
+    let lastTouchDodge = 0;
+    document.addEventListener('touchmove', (e) => {
+        const scene2 = document.getElementById('scene2');
+        if (!scene2 || !scene2.classList.contains('active')) return;
+        const now = Date.now();
+        if (now - lastTouchDodge < 220) return;
+        const touch = e.touches && e.touches[0];
+        if (!touch) return;
+        const rect = btnNo.getBoundingClientRect();
+        const cx = rect.left + rect.width / 2;
+        const cy = rect.top + rect.height / 2;
+        const dist = Math.hypot(touch.clientX - cx, touch.clientY - cy);
+        if (dist < 70) {
+            lastTouchDodge = now;
+            dodgeNo();
+        }
+    }, { passive: true });
+
+    /* ============================================================
+       TIM VỠ KHI BẤM YES
+       ============================================================ */
+    function burstHearts(x, y) {
+        const emojis = ['💖', '💕', '💗', '✨', '🌸'];
+        for (let i = 0; i < 18; i++) {
+            const el = document.createElement('div');
+            el.className = 'burst-heart';
+            el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+            const angle = Math.random() * Math.PI * 2;
+            const dist = 80 + Math.random() * 140;
+            el.style.setProperty('--dx', `${Math.cos(angle) * dist}px`);
+            el.style.setProperty('--dy', `${Math.sin(angle) * dist - 60}px`);
+            el.style.setProperty('--rot', `${(Math.random() - 0.5) * 360}deg`);
+            el.style.left = x + 'px';
+            el.style.top = y + 'px';
+            document.body.appendChild(el);
+            setTimeout(() => el.remove(), 1500);
+        }
+    }
+
+    btnYes.addEventListener('click', (e) => {
+        burstHearts(e.clientX, e.clientY);
+        setTimeout(() => showScene('scene3'), 500);
+    });
+
+    /* ============================================================
+       XÁC NHẬN NGÀY GIỜ -> MÀN HÌNH THÀNH CÔNG
+       ============================================================ */
+    document.getElementById('btnConfirm').addEventListener('click', (e) => {
+        burstHearts(e.clientX, e.clientY);
+        setTimeout(() => {
+            showScene('scene4');
+            const t1 = document.getElementById('successTxt1');
+            const t2 = document.getElementById('successTxt2');
+            setTimeout(() => {
+                t1.style.opacity = '0';
+                setTimeout(() => {
+                    t1.style.display = 'none';
+                    t2.style.display = 'block';
+                    typeText(t2, 'Have a good day, bae !!!', 35, () => {
+                        setTimeout(() => launchConfettiHearts(), 300);
+                    });
+                }, 1000);
+            }, 2200);
+        }, 500);
+    });
+
+    let currentTypeTimer = null;
+    function typeText(el, text, speed, onDone) {
+        clearInterval(currentTypeTimer);
+        el.textContent = '';
+        el.classList.add('type-cursor');
+        el.style.opacity = '1';
+        let i = 0;
+        currentTypeTimer = setInterval(() => {
+            el.textContent += text[i];
+            i++;
+            if (i >= text.length) {
+                clearInterval(currentTypeTimer);
+                el.classList.remove('type-cursor');
+                if (onDone) onDone();
+            }
+        }, speed);
+    }
+
+    /* ============================================================
+       STICKER: CHẠM VÀO HIỆN KHUNG TRẮNG + CHỮ CHẠY DẦN
+       ============================================================ */
+    const stickerBox = document.getElementById('stickerBox');
+    const stickerText = document.getElementById('stickerText');
+    let currentDeco = null;
+    let currentLang = 'en';
+
+    function showStickerMessage() {
+        if (!currentDeco) return;
+        const msg = currentLang === 'en'
+            ? currentDeco.getAttribute('data-msg-en')
+            : currentDeco.getAttribute('data-msg-vi');
+        clearInterval(currentTypeTimer);
+        stickerText.textContent = '';
+        stickerText.classList.remove('type-cursor');
+        setTimeout(() => typeText(stickerText, msg, 28), 300);
+    }
+
+    document.querySelectorAll('.deco').forEach(deco => {
+        deco.addEventListener('click', (e) => {
+            e.stopPropagation();
+            currentDeco = deco;
+            currentLang = 'en';
+            stickerBox.classList.add('show');
+            showStickerMessage();
+        });
+    });
+
+    // bấm vào khung -> đổi ngôn ngữ Anh/Việt
+    stickerBox.addEventListener('click', (e) => {
+        e.stopPropagation();
+        currentLang = currentLang === 'en' ? 'vi' : 'en';
+        showStickerMessage();
+    });
+
+    document.addEventListener('click', (e) => {
+        if (stickerBox.classList.contains('show') &&
+            !stickerBox.contains(e.target) &&
+            !e.target.classList.contains('deco')) {
+            stickerBox.classList.remove('show');
+            clearInterval(currentTypeTimer);
+            currentDeco = null;
+        }
+    });
+
+    function launchConfettiHearts() {
+        const centerX = window.innerWidth / 2;
+        for (let i = 0; i < 4; i++) {
+            setTimeout(() => burstHearts(centerX + (Math.random() - 0.5) * 200, window.innerHeight * 0.4), i * 300);
+        }
+    }
+    </script>
 </body>
 </html>
